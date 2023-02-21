@@ -45,15 +45,32 @@ node('worker') {
             // is considered unhealthy.
             // TODO: account for disabled nightly pipelines
             featureReleases.each { featureRelease ->
-                def assets = sh(returnStdout: true, script: "wget -q -O - '${apiUrl}/v3/assets/feature_releases/${featureRelease}/ea?image_type=jdk&os=linux&architecture=x64&sort_method=DATE&pages=1&jvm_impl=${apiVariant}'")
-                def assetsJson = new JsonSlurper().parseText(assets)
-                def ts = assetsJson[0].timestamp // newest timestamp of a jdk asset
-                def assetTs = Instant.parse(ts).atZone(ZoneId.of('UTC'))
-                def now = ZonedDateTime.now(ZoneId.of('UTC'))
-                def days = ChronoUnit.DAYS.between(assetTs, now)
-                def status = [maxStaleDays: nightlyStaleDays, actualDays: days]
-                def key = "jdk${featureRelease}"
-                healthStatus[key] = status
+                if (featureRelease == 8) {
+                    def flavours = [ 'git-skara-jdk8u', 'git-skara-aarch32-jdk8u', 'git-skara-alpine-jdk8']
+
+                    flavours.each { flavour ->
+                        def assets = sh(returnStdout: true, script: "wget -q -O - '${jenkinsUrl}/view/git-mirrors/job/git-mirrors/job/adoptium/job/git-skara-jdk${flavour}/lastSuccessfulBuild/api/json'")
+                        def assetsJson = new JsonSlurper().parseText(assets)
+                        def ts = assetsJson[0].timestamp // newest timestamp of a jdk asset
+                        def assetTs = Instant.parse(ts).atZone(ZoneId.of('UTC'))
+                        def now = ZonedDateTime.now(ZoneId.of('UTC'))
+                        def days = ChronoUnit.DAYS.between(assetTs, now)
+                        def status = [maxStaleDays: nightlyStaleDays, actualDays: days]
+                        def key = "jdk${featureRelease}"
+                        healthStatus[key] = status
+                    }
+                }
+                else {
+                    def assets = sh(returnStdout: true, script: "wget -q -O - '${apiUrl}/v3/assets/feature_releases/${featureRelease}/ea?image_type=jdk&os=linux&architecture=x64&sort_method=DATE&pages=1&jvm_impl=${apiVariant}'")
+                    def assetsJson = new JsonSlurper().parseText(assets)
+                    def ts = assetsJson[0].timestamp // newest timestamp of a jdk asset
+                    def assetTs = Instant.parse(ts).atZone(ZoneId.of('UTC'))
+                    def now = ZonedDateTime.now(ZoneId.of('UTC'))
+                    def days = ChronoUnit.DAYS.between(assetTs, now)
+                    def status = [maxStaleDays: nightlyStaleDays, actualDays: days]
+                    def key = "jdk${featureRelease}"
+                    healthStatus[key] = status
+                }
             }
         }
     }
@@ -269,23 +286,11 @@ node('worker') {
                     slackColor = 'warning'
                     fullMessage = "JDK ${featureRelease} nightly pipeline publish status: unhealthy. Last published: ${msg}. Stale threshold: ${maxDays} days."
                 }
-
-                def tmp_Warining = 'warning' // TODORC: cleanup
-                def tmp_Message = 'There will be more' // TODORC: cleanup
-
-                if (featureRelease == 8) {
-                    slackSend(channel: slackChannel, color: slackColor, message: fullMessage)
-                    slackSend(channel: slackChannel, color: tmp_Warining, message: tmp_Message)
-                    slackSend(channel: slackChannel, color: tmp_Warining, message: tmp_Message)
-                    echo "===> ${fullMessage}" // TORORC: duplicity
-                } else {
-                    echo "===> ${fullMessage}"
-                    // One slack message per JDK version:
-                    slackSend(channel: slackChannel, color: slackColor, message: fullMessage)
-                }
+                echo "===> ${fullMessage}"
+                // One slack message per JDK version:
+                slackSend(channel: slackChannel, color: slackColor, message: fullMessage)
             }
             echo '----------------------------------------------------------------'
         }
     }
 }
-
