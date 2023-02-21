@@ -49,7 +49,7 @@ node('worker') {
                     def flavours = [ 'git-skara-jdk8u', 'git-skara-aarch32-jdk8u', 'git-skara-alpine-jdk8']
 
                     flavours.each { flavour ->
-                        def assets = sh(returnStdout: true, script: "wget -q -O - '${jenkinsUrl}/view/git-mirrors/job/git-mirrors/job/adoptium/job/git-skara-jdk${flavour}/lastSuccessfulBuild/api/json'")
+                        def assets = sh(returnStdout: true, script: "wget -q -O - '${jenkinsUrl}/view/git-mirrors/job/git-mirrors/job/adoptium/job/${flavour}/lastSuccessfulBuild/api/json'")
                         def assetsJson = new JsonSlurper().parseText(assets)
                         def ts = assetsJson[0].timestamp // newest timestamp of a jdk asset
                         def assetTs = Instant.parse(ts).atZone(ZoneId.of('UTC'))
