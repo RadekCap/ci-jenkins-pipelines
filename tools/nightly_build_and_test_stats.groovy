@@ -56,7 +56,7 @@ node('worker') {
                         // def now = ZonedDateTime.now(ZoneId.of('UTC'))
                         // def days = ChronoUnit.DAYS.between(assetTs, now)
                         // def status = [maxStaleDays: nightlyStaleDays, actualDays: days]
-                        def status = {maxStaleDays=5, actualDays=4}
+                        def status = [maxStaleDays=5, actualDays=4]
                         // def key = "jdk${featureRelease}"
                         healthStatus[key] = status
                     }
