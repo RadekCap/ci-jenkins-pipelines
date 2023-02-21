@@ -46,9 +46,9 @@ node('worker') {
             // TODO: account for disabled nightly pipelines
             featureReleases.each { featureRelease ->
                 if (featureRelease == 8) {
-                    def flavours = [ 'git-skara-jdk8u', 'git-skara-aarch32-jdk8u', 'git-skara-alpine-jdk8']
+                    // def flavours = [ 'git-skara-jdk8u', 'git-skara-aarch32-jdk8u', 'git-skara-alpine-jdk8']
 
-                    flavours.each { flavour ->
+                    // flavours.each { flavour ->
                         // def assets = sh(returnStdout: true, script: "wget -q -O - '${jenkinsUrl}/view/git-mirrors/job/git-mirrors/job/adoptium/job/${flavour}/lastSuccessfulBuild/api/json'")
                         // def assetsJson = new JsonSlurper().parseText(assets)
                         // def ts = assetsJson[0].timestamp // newest timestamp of a jdk asset
@@ -58,7 +58,7 @@ node('worker') {
                         // def status = [maxStaleDays: nightlyStaleDays, actualDays: days]
                         // def key = "jdk${featureRelease}"
                         // healthStatus[key] = status
-                    }
+                    // }
                 }
                 else {
                     def assets = sh(returnStdout: true, script: "wget -q -O - '${apiUrl}/v3/assets/feature_releases/${featureRelease}/ea?image_type=jdk&os=linux&architecture=x64&sort_method=DATE&pages=1&jvm_impl=${apiVariant}'")
