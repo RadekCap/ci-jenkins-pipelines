@@ -50,8 +50,8 @@ node('worker') {
 
                     flavours.each { flavour ->
                         def assets = sh(returnStdout: true, script: "wget -q -O - '${jenkinsUrl}/view/git-mirrors/job/git-mirrors/job/adoptium/job/${flavour}/lastSuccessfulBuild/api/json'")
-                        def assetsJson = new JsonSlurper().parseText(assets)
-                        def ts = assetsJson[0].timestamp // newest timestamp of a jdk asset
+                        // def assetsJson = new JsonSlurper().parseText(assets)
+                        // def ts = assetsJson[0].timestamp // newest timestamp of a jdk asset
                         // def assetTs = Instant.parse(ts).atZone(ZoneId.of('UTC'))
                         // def now = ZonedDateTime.now(ZoneId.of('UTC'))
                         // def days = ChronoUnit.DAYS.between(assetTs, now)
