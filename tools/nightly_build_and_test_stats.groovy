@@ -269,9 +269,20 @@ node('worker') {
                     slackColor = 'warning'
                     fullMessage = "JDK ${featureRelease} nightly pipeline publish status: unhealthy. Last published: ${msg}. Stale threshold: ${maxDays} days."
                 }
-                echo "===> ${fullMessage}"
-                // One slack message per JDK version:
-                slackSend(channel: slackChannel, color: slackColor, message: fullMessage)
+
+                def tmp_Warining = 'warning' // TODORC: cleanup
+                def tmp_Message = 'There will be more' // TODORC: cleanup
+
+                if (featureRelease.contains(8)) {
+                    slackSend(channel: slackChannel, color: slackColor, message: fullMessage)
+                    slackSend(channel: slackChannel, color: tmp_Warining, message: tmp_Message)
+                    slackSend(channel: slackChannel, color: tmp_Warining, message: tmp_Message)
+                    echo "===> ${fullMessage}" // TORORC: duplicity
+                } else {
+                    echo "===> ${fullMessage}"
+                    // One slack message per JDK version:
+                    slackSend(channel: slackChannel, color: slackColor, message: fullMessage)
+                }
             }
             echo '----------------------------------------------------------------'
         }
